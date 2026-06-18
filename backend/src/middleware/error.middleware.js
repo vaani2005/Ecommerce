@@ -1,22 +1,38 @@
 const { ZodError } = require("zod");
 const AppError = require("../utils/AppError");
 
+function formatZodErrors(errors) {
+  const formatted = {};
+  errors.forEach((error) => {
+    const path = error.path.join(".");
+    if (!formatted[path]) {
+      formatted[path] = [];
+    }
+    formatted[path].push(error.message);
+  });
+  return formatted;
+}
+
 function errorHandler(err, req, res, next) {
   if (err instanceof ZodError) {
+    const fieldErrors = formatZodErrors(err.errors);
     return res.status(400).json({
+      success: false,
       message: "Validation failed",
-      errors: err.errors,
+      errors: fieldErrors,
     });
   }
 
   if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
     return res.status(401).json({
+      success: false,
       message: "Invalid or expired token",
     });
   }
 
   if (err instanceof AppError) {
     return res.status(err.status).json({
+      success: false,
       message: err.message,
     });
   }
@@ -24,6 +40,7 @@ function errorHandler(err, req, res, next) {
   console.error(err);
 
   return res.status(err.status || 500).json({
+    success: false,
     message: err.message || "Internal Server Error",
   });
 }

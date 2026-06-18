@@ -1,9 +1,12 @@
 const orderService = require("../services/order.service");
 const asyncHandler = require("../middleware/asyncHandler");
 const AppError = require("../utils/AppError");
+const { invalidateProductsCache } = require("../services/cache.service");
 
 exports.createOrder = asyncHandler(async (req, res) => {
   const order = await orderService.createOrder(req.user.id, req.body.items);
+
+  await invalidateProductsCache();
 
   res.status(201).json(order);
 });

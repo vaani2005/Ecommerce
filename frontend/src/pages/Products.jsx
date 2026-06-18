@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import ProductCard from "../components/ProductCard";
 import { useAuth } from "../context/AuthContext";
+import { getFieldError, hasFieldError } from "../utils/errorHandler";
 import "./Products.css";
 
 export default function Products() {
@@ -27,7 +28,9 @@ export default function Products() {
     stock: "",
   });
   const [editingProduct, setEditingProduct] = useState(null);
-  const [error, setError] = useState("");
+  const [generalError, setGeneralError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [formError, setFormError] = useState("");
 
   useEffect(() => {
     fetchProducts();
@@ -64,7 +67,11 @@ export default function Products() {
       setTotal(data.total);
       setCategoryCounts(data.categoryCounts || []);
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to load products");
+      const formattedError = err.formattedError || {
+        message: "Unable to load products",
+        fieldErrors: {},
+      };
+      setGeneralError(formattedError.message);
     } finally {
       setLoading(false);
     }
@@ -79,10 +86,26 @@ export default function Products() {
       price: "",
       stock: "",
     });
+    setFieldErrors({});
+    setFormError("");
+  };
+
+  const handleFormChange = (field, value) => {
+    setForm({ ...form, [field]: value });
+    // Clear field error when user starts typing
+    if (fieldErrors[field]) {
+      setFieldErrors({
+        ...fieldErrors,
+        [field]: undefined,
+      });
+    }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setFormError("");
+    setFieldErrors({});
+
     try {
       const payload = {
         name: form.name,
@@ -101,7 +124,16 @@ export default function Products() {
       resetForm();
       fetchProducts();
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to save product");
+      const formattedError = err.formattedError || {
+        message: "Unable to save product",
+        fieldErrors: {},
+      };
+
+      if (Object.keys(formattedError.fieldErrors).length > 0) {
+        setFieldErrors(formattedError.fieldErrors);
+      } else {
+        setFormError(formattedError.message);
+      }
     }
   };
 
@@ -114,6 +146,8 @@ export default function Products() {
       price: product.price,
       stock: product.stock,
     });
+    setFieldErrors({});
+    setFormError("");
   };
 
   const handleDelete = async (productId) => {
@@ -124,7 +158,11 @@ export default function Products() {
       await api.delete(`/products/${productId}`);
       fetchProducts();
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to delete product");
+      const formattedError = err.formattedError || {
+        message: "Unable to delete product",
+        fieldErrors: {},
+      };
+      setGeneralError(formattedError.message);
     }
   };
 
@@ -138,10 +176,6 @@ export default function Products() {
           <p className="page-subtitle">
             Browse inventory, filter by category, price, and stock availability.
           </p>
-        </div>
-        <div className="page-stats">
-          <span>{total} products</span>
-          <span>Page {page}</span>
         </div>
       </div>
 
@@ -230,25 +264,6 @@ export default function Products() {
                 <option value="true">In stock</option>
               </select>
             </label>
-
-            <label>
-              Sort by
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="createdAt">Newest</option>
-                <option value="price">Price</option>
-              </select>
-            </label>
-
-            <label>
-              Order
-              <select value={order} onChange={(e) => setOrder(e.target.value)}>
-                <option value="desc">Desc</option>
-                <option value="asc">Asc</option>
-              </select>
-            </label>
           </div>
 
           <div className="category-list">
@@ -272,50 +287,96 @@ export default function Products() {
         </aside>
 
         <main className="products-main">
-          {error && <p className="error-text">{error}</p>}
+          {generalError && <p className="error-text">{generalError}</p>}
 
           {user?.role !== "customer" && user && (
             <div className="product-form-card">
               <h2>{editingProduct ? "Edit Product" : "Create Product"}</h2>
+              {formError && <p className="error-text">{formError}</p>}
               <form onSubmit={handleSubmit}>
-                <input
-                  placeholder="Name"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  required
-                />
-                <input
-                  placeholder="Category"
-                  value={form.category}
-                  onChange={(e) =>
-                    setForm({ ...form, category: e.target.value })
-                  }
-                  required
-                />
-                <input
-                  placeholder="Description"
-                  value={form.description}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
-                  }
-                />
-                <input
-                  type="number"
-                  placeholder="Price"
-                  value={form.price}
-                  onChange={(e) => setForm({ ...form, price: e.target.value })}
-                  required
-                  min="0"
-                  step="0.01"
-                />
-                <input
-                  type="number"
-                  placeholder="Stock"
-                  value={form.stock}
-                  onChange={(e) => setForm({ ...form, stock: e.target.value })}
-                  required
-                  min="0"
-                />
+                <div className="form-group">
+                  <input
+                    placeholder="Product Name"
+                    value={form.name}
+                    onChange={(e) => handleFormChange("name", e.target.value)}
+                    className={
+                      hasFieldError(fieldErrors, "name") ? "input-error" : ""
+                    }
+                  />
+                  {getFieldError(fieldErrors, "name") && (
+                    <span className="field-error">
+                      {getFieldError(fieldErrors, "name")}
+                    </span>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <input
+                    placeholder="Category"
+                    value={form.category}
+                    onChange={(e) =>
+                      handleFormChange("category", e.target.value)
+                    }
+                    className={
+                      hasFieldError(fieldErrors, "category")
+                        ? "input-error"
+                        : ""
+                    }
+                  />
+                  {getFieldError(fieldErrors, "category") && (
+                    <span className="field-error">
+                      {getFieldError(fieldErrors, "category")}
+                    </span>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <input
+                    placeholder="Description"
+                    value={form.description}
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="form-group">
+                  <input
+                    type="number"
+                    placeholder="Price"
+                    value={form.price}
+                    onChange={(e) => handleFormChange("price", e.target.value)}
+                    className={
+                      hasFieldError(fieldErrors, "price") ? "input-error" : ""
+                    }
+                    min="0"
+                    step="0.01"
+                  />
+                  {getFieldError(fieldErrors, "price") && (
+                    <span className="field-error">
+                      {getFieldError(fieldErrors, "price")}
+                    </span>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <input
+                    type="number"
+                    placeholder="Stock"
+                    value={form.stock}
+                    onChange={(e) => handleFormChange("stock", e.target.value)}
+                    className={
+                      hasFieldError(fieldErrors, "stock") ? "input-error" : ""
+                    }
+                    min="0"
+                  />
+                  {getFieldError(fieldErrors, "stock") && (
+                    <span className="field-error">
+                      {getFieldError(fieldErrors, "stock")}
+                    </span>
+                  )}
+                </div>
+
                 <div className="form-actions">
                   <button type="submit">
                     {editingProduct ? "Save" : "Create"}

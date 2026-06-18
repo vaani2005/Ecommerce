@@ -64,7 +64,6 @@
 .filter-input,
 .filters select,
 .filters input {
-  width: 100%;
   padding: 14px 16px;
   border-radius: 16px;
   border: 1px solid #d1d5db;
@@ -214,13 +213,47 @@
   margin-top: 0;
 }
 
+.form-group {
+  margin-bottom: 16px;
+}
+
 .product-form-card input,
 .product-form-card select {
-  width: 100%;
+  width: 95%;
   padding: 14px 16px;
-  margin-bottom: 16px;
   border-radius: 16px;
-  border: 1px solid #d1d5db;
+  border: 2px solid #d1d5db;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.product-form-card input:focus,
+.product-form-card select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.product-form-card input.input-error {
+  border-color: #dc2626;
+  background-color: #fee2e2;
+}
+
+.field-error {
+  display: block;
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 4px;
+  margin-left: 4px;
+}
+
+.error-text {
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  border-left: 4px solid #dc2626;
 }
 
 .form-actions {
@@ -236,6 +269,17 @@
   color: white;
   background: #2563eb;
   font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.form-actions button:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.form-actions button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
 }
 
 .form-actions button[type="button"] {
