@@ -4,30 +4,37 @@
  * @returns {Object} { fieldErrors: {}, message: "" }
  */
 export const getErrorDetails = (error) => {
+  if (error?.formattedError) {
+    return error.formattedError;
+  }
+
   const response = error.response;
 
   if (!response) {
     return {
       fieldErrors: {},
       message: "Network error. Please check your connection.",
+      status: 0,
     };
   }
 
-  const data = response.data;
+  const data = response.data || {};
 
   // Handle validation errors (400)
   if (response.status === 400 && data.errors) {
     return {
       fieldErrors: data.errors,
       message: data.message || "Validation failed",
+      status: response.status,
     };
   }
 
   // Handle other HTTP errors
   if (data.message) {
     return {
-      fieldErrors: {},
+      fieldErrors: data.errors || {},
       message: data.message,
+      status: response.status,
     };
   }
 
@@ -41,8 +48,9 @@ export const getErrorDetails = (error) => {
   };
 
   return {
-    fieldErrors: {},
+    fieldErrors: data.errors || {},
     message: statusMessages[response.status] || `Error: ${response.statusText}`,
+    status: response.status,
   };
 };
 

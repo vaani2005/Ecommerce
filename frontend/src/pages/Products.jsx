@@ -10,6 +10,7 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [inStock, setInStock] = useState("");
@@ -37,6 +38,7 @@ export default function Products() {
   }, [
     search,
     category,
+    selectedCategories,
     minPrice,
     maxPrice,
     inStock,
@@ -51,13 +53,19 @@ export default function Products() {
     try {
       const params = {
         search,
-        category,
         inStock,
         sortBy,
         order,
         page,
         pageSize,
       };
+
+      if (selectedCategories.length > 0) {
+        const uniqueCategories = Array.from(new Set(selectedCategories));
+        params.categories = uniqueCategories.join(",");
+      } else if (category) {
+        params.category = category;
+      }
 
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
@@ -188,7 +196,10 @@ export default function Products() {
                 className="filter-input"
                 placeholder="Search product..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
               />
               <div className="actions">
                 <button
@@ -204,6 +215,7 @@ export default function Products() {
                   onClick={() => {
                     setSearch("");
                     setCategory("");
+                    setSelectedCategories([]);
                     setMinPrice("");
                     setMaxPrice("");
                     setInStock("");
@@ -221,7 +233,10 @@ export default function Products() {
               Category
               <select
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => {
+                  setCategory(e.target.value);
+                  setPage(1);
+                }}
               >
                 <option value="">All categories</option>
                 {categories.filter(Boolean).map((option) => (
@@ -238,7 +253,10 @@ export default function Products() {
                 type="number"
                 placeholder="0"
                 value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
+                onChange={(e) => {
+                  setMinPrice(e.target.value);
+                  setPage(1);
+                }}
                 min="0"
               />
             </label>
@@ -249,7 +267,10 @@ export default function Products() {
                 type="number"
                 placeholder="0"
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
+                onChange={(e) => {
+                  setMaxPrice(e.target.value);
+                  setPage(1);
+                }}
                 min="0"
               />
             </label>
@@ -258,7 +279,10 @@ export default function Products() {
               Availability
               <select
                 value={inStock}
-                onChange={(e) => setInStock(e.target.value)}
+                onChange={(e) => {
+                  setInStock(e.target.value);
+                  setPage(1);
+                }}
               >
                 <option value="">All stock</option>
                 <option value="true">In stock</option>
@@ -276,7 +300,10 @@ export default function Products() {
                   <button
                     key={item._id}
                     className="category-tag"
-                    onClick={() => setCategory(item._id)}
+                    onClick={() => {
+                      setCategory(category === item._id ? "" : item._id);
+                      setPage(1);
+                    }}
                   >
                     {item._id} ({item.count})
                   </button>

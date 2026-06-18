@@ -67,13 +67,30 @@ exports.createOrder = async (userId, items) => {
     session.endSession();
   }
 };
-exports.getOrders = async (user) => {
-  const query = user.role === "customer" ? { customer: user.id } : {};
 
-  return Order.find(query)
-    .populate("customer", "name email")
-    .populate("items.product", "name")
-    .lean();
+exports.getOrders = async (user, query = {}) => {
+  const { page = 1, pageSize = 10 } = query;
+
+  const filter = user.role === "customer" ? { customer: user.id } : {};
+  const skip = (Number(page) - 1) * Number(pageSize);
+
+  const [orders, total] = await Promise.all([
+    Order.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(pageSize))
+      .populate("customer", "name email")
+      .populate("items.product", "name")
+      .lean(),
+    Order.countDocuments(filter),
+  ]);
+
+  return {
+    orders,
+    total,
+    page: Number(page),
+    pageSize: Number(pageSize),
+  };
 };
 
 exports.getOrderById = async (id, user) => {

@@ -12,8 +12,8 @@ exports.createOrder = asyncHandler(async (req, res) => {
 });
 
 exports.getOrders = asyncHandler(async (req, res) => {
-  const orders = await orderService.getOrders(req.user);
-  res.json(orders);
+  const response = await orderService.getOrders(req.user, req.query);
+  res.json(response);
 });
 
 exports.getOrder = asyncHandler(async (req, res) => {

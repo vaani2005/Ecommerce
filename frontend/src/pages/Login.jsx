@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
-import { getFieldError, hasFieldError } from "../utils/errorHandler";
+import {
+  getErrorDetails,
+  getFieldError,
+  hasFieldError,
+} from "../utils/errorHandler";
 import "./Auth.css";
 import { useAuth } from "../context/AuthContext";
 
@@ -37,10 +41,7 @@ export default function Login() {
 
       navigate("/products");
     } catch (err) {
-      const formattedError = err.formattedError || {
-        message: "Unable to login",
-        fieldErrors: {},
-      };
+      const formattedError = getErrorDetails(err);
 
       if (Object.keys(formattedError.fieldErrors).length > 0) {
         setFieldErrors(formattedError.fieldErrors);

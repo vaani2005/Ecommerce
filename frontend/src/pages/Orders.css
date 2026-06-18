@@ -22,6 +22,35 @@
   gap: 16px;
 }
 
+.orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-controls button {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+.pagination-controls button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
 .error-text {
   color: #b91c1c;
 }

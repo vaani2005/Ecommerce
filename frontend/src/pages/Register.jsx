@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
-import { getFieldError, hasFieldError } from "../utils/errorHandler";
+import {
+  getErrorDetails,
+  getFieldError,
+  hasFieldError,
+} from "../utils/errorHandler";
 import "./Auth.css";
 
 export default function Register() {
@@ -44,10 +48,11 @@ export default function Register() {
       alert("Registration successful! Please login.");
       navigate("/");
     } catch (err) {
-      const formattedError = err.formattedError || {
-        message: "Registration failed",
-        fieldErrors: {},
-      };
+      console.log("Full Error:", err);
+      console.log("Response Data:", err.response?.data);
+      console.log("Status:", err.response?.status);
+
+      const formattedError = getErrorDetails(err);
 
       if (Object.keys(formattedError.fieldErrors).length > 0) {
         setFieldErrors(formattedError.fieldErrors);
@@ -114,7 +119,6 @@ export default function Register() {
           <select name="role" onChange={handleChange} value={form.role}>
             <option value="customer">Customer</option>
             <option value="manager">Manager</option>
-            <option value="admin">Admin</option>
           </select>
         </div>
 

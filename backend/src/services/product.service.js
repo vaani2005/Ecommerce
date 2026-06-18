@@ -5,6 +5,7 @@ exports.getProducts = async (query) => {
     page = 1,
     pageSize = 10,
     category,
+    categories,
     minPrice,
     maxPrice,
     inStock,
@@ -15,8 +16,27 @@ exports.getProducts = async (query) => {
 
   const filter = {};
 
+  const categoryValues = [];
+
+  if (categories) {
+    const rawCategories = Array.isArray(categories)
+      ? categories
+      : String(categories).split(",");
+
+    rawCategories.forEach((value) => {
+      const normalized = String(value || "").trim();
+      if (normalized) {
+        categoryValues.push(normalized);
+      }
+    });
+  }
+
   if (category) {
-    filter.category = category;
+    categoryValues.push(String(category).trim());
+  }
+
+  if (categoryValues.length) {
+    filter.category = { $in: [...new Set(categoryValues)] };
   }
 
   if (minPrice || maxPrice) {
@@ -50,26 +70,65 @@ exports.getProducts = async (query) => {
 
   const skip = (Number(page) - 1) * Number(pageSize);
 
-  const result = await Product.aggregate([
-    {
-      $match: filter,
-    },
+  // const result = await Product.aggregate([
+  //   {
+  //     $match: filter,
+  //   },
 
+  //   {
+  //     $facet: {
+  //       products: [
+  //         {
+  //           $sort: sort,
+  //         },
+
+  //         {
+  //           $skip: skip,
+  //         },
+
+  //         {
+  //           $limit: Number(pageSize),
+  //         },
+
+  //         {
+  //           $project: {
+  //             name: 1,
+  //             category: 1,
+  //             price: 1,
+  //             stock: 1,
+  //             createdAt: 1,
+  //           },
+  //         },
+  //       ],
+
+  //       totalCount: [
+  //         {
+  //           $count: "count",
+  //         },
+  //       ],
+
+  //       categoryCounts: [
+  //         {
+  //           $group: {
+  //             _id: "$category",
+  //             count: {
+  //               $sum: 1,
+  //             },
+  //           },
+  //         },
+  //       ],
+  //     },
+  //   },
+  // ]);
+
+  const result = await Product.aggregate([
     {
       $facet: {
         products: [
-          {
-            $sort: sort,
-          },
-
-          {
-            $skip: skip,
-          },
-
-          {
-            $limit: Number(pageSize),
-          },
-
+          { $match: filter },
+          { $sort: sort },
+          { $skip: skip },
+          { $limit: Number(pageSize) },
           {
             $project: {
               name: 1,
@@ -81,11 +140,7 @@ exports.getProducts = async (query) => {
           },
         ],
 
-        totalCount: [
-          {
-            $count: "count",
-          },
-        ],
+        totalCount: [{ $match: filter }, { $count: "count" }],
 
         categoryCounts: [
           {
@@ -96,11 +151,15 @@ exports.getProducts = async (query) => {
               },
             },
           },
+          {
+            $sort: {
+              _id: 1,
+            },
+          },
         ],
       },
     },
   ]);
-
   return {
     products: result[0].products,
     total: result[0].totalCount[0]?.count || 0,
