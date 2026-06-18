@@ -58,8 +58,6 @@ export default function OrderCard({ order, onChange }) {
       </div>
 
       <footer className="order-card__footer">
-        <button className="btn btn--small">View</button>
-
         {user && (user.role === "manager" || user.role === "admin") && (
           <>
             <button
