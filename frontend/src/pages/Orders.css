@@ -1,0 +1,27 @@
+.page-container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.page-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.page-subtitle {
+  margin: 6px 0 0;
+  color: #475569;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.error-text {
+  color: #b91c1c;
+}

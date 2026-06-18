@@ -1,0 +1,148 @@
+.product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  max-width: 360px;
+  min-height: 240px;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 55px rgba(15, 23, 42, 0.14);
+}
+
+.product-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-card__category {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.product-card__status {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.product-card__status.in-stock {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.product-card__status.out-stock {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.product-card__name {
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 700;
+  margin: 0;
+}
+
+.product-card__description {
+  color: #475569;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.product-card__details {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.product-card__price {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1d4ed8;
+}
+
+.product-card__stock {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.product-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.product-card__order {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.product-card__quantity {
+  width: 70px;
+  border: 1px solid #e6e9ef;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.product-card__btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.product-card__btn:hover {
+  opacity: 0.94;
+}
+
+.product-card__btn--order {
+  background: #2563eb;
+}
+
+.product-card__btn--edit {
+  background: #2563eb;
+}
+
+.product-card__btn--delete {
+  background: #ef4444;
+}
+
+.product-card__btn:active {
+  transform: translateY(1px);
+}
+
+.product-card__description {
+  min-height: 42px;
+}
+
+.product-card__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
