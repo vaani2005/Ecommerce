@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
-
-const { authenticate } = require("../middleware/auth.middleware");
+const authenticate = require("../middleware/auth.middleware");
 const { authorize } = require("../middleware/role.middleware");
-const { validateRequest } = require("../middleware/validate.middleware");
+const validateRequest = require("../middleware/validate.middleware");
 const {
   createOrder,
   getOrders,
   getOrder,
   updateOrderStatus,
+  getCustomerOrders,
 } = require("../controllers/order.controller");
 const {
   createOrderSchema,
@@ -22,7 +22,12 @@ router.post(
   validateRequest(createOrderSchema),
   createOrder,
 );
-
+router.get(
+  "/customer/:id",
+  authenticate,
+  authorize("admin"),
+  getCustomerOrders,
+);
 router.get("/", authenticate, getOrders);
 router.get("/:id", authenticate, getOrder);
 

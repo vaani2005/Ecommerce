@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
-
-const { authenticate } = require("../middleware/auth.middleware");
-const { rateLimit } = require("../middleware/rateLimiter.middleware");
-const { validateRequest } = require("../middleware/validate.middleware");
+const authenticate = require("../middleware/auth.middleware");
+const rateLimit = require("../middleware/rateLimiter.middleware");
+const validateRequest = require("../middleware/validate.middleware");
 const {
   register,
   login,

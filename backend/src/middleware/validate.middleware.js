@@ -5,14 +5,8 @@ const validateRequest = (schema) => (req, res, next) => {
     req.body = schema.parse(req.body);
     next();
   } catch (error) {
-    if (error instanceof ZodError) {
-      return next(error);
-    }
-
     return next(error);
   }
 };
 
-module.exports = {
-  validateRequest,
-};
+module.exports = validateRequest;

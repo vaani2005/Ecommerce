@@ -48,7 +48,7 @@ exports.createOrder = async (userId, items) => {
     const [order] = await Order.create(
       [
         {
-          customer: userId,
+          customer: customerId,
           items: orderItems,
           totalAmount,
         },
@@ -152,4 +152,11 @@ exports.updateOrderStatus = async (orderId, status) => {
   } finally {
     session.endSession();
   }
+};
+
+exports.getOrdersByCustomer = async (customerId) => {
+  return Order.find({ customer: customerId })
+    .populate("items.product")
+    .sort({ createdAt: -1 })
+    .lean();
 };

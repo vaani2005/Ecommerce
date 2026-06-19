@@ -17,10 +17,23 @@ function Navbar() {
 
       <div className="nav-links">
         <Link to="/products">Products</Link>
-        {user && <Link to="/orders">Orders</Link>}
+
+        {user?.role === "admin" && (
+          <>
+            <Link to="/managers">Managers</Link>
+            <Link to="/customers">Customers</Link>
+            <Link to="/orders">Orders</Link>
+          </>
+        )}
+
+        {user?.role !== "admin" && user && <Link to="/orders">My Orders</Link>}
+
         {user ? (
           <>
-            <span className="nav-user">{user.email}</span>
+            <span className="nav-user">
+              {user.email} ({user.role})
+            </span>
+
             <button className="logout-btn" onClick={handleLogout}>
               Logout
             </button>

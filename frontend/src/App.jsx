@@ -13,8 +13,10 @@ import Register from "./pages/Register";
 import Products from "./pages/Products";
 import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
-import Navbar from "./components/Navbar";
-
+import Managers from "./pages/Managers";
+import Customers from "./pages/Customers";
+import Sidebar from "./components/Sidebar";
+import MyProducts from "./pages/MyProducts";
 function RequireAuth({ children }) {
   const { user } = useAuth();
   const location = useLocation();
@@ -35,7 +37,118 @@ function RequireGuest({ children }) {
 
   return children;
 }
+function RequireManager({ children }) {
+  const { user } = useAuth();
 
+  if (!user || user.role !== "manager") {
+    return <Navigate to="/products" replace />;
+  }
+
+  return children;
+}
+function RequireAdmin({ children }) {
+  const { user } = useAuth();
+
+  if (!user || user.role !== "admin") {
+    return <Navigate to="/products" replace />;
+  }
+
+  return children;
+}
+function Layout() {
+  const location = useLocation();
+
+  const hideSidebar = ["/", "/register"].includes(location.pathname);
+
+  return (
+    <div className="app-layout">
+      {!hideSidebar && <Sidebar />}
+
+      <div className={hideSidebar ? "" : "main-content"}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <RequireGuest>
+                <Login />
+              </RequireGuest>
+            }
+          />
+          <Route
+            path="/managers"
+            element={
+              <RequireAdmin>
+                <Managers />
+              </RequireAdmin>
+            }
+          />
+
+          <Route
+            path="/customers"
+            element={
+              <RequireAdmin>
+                <Customers />
+              </RequireAdmin>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <RequireGuest>
+                <Register />
+              </RequireGuest>
+            }
+          />
+
+          <Route
+            path="/products"
+            element={
+              <RequireAuth>
+                <Products />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/my-products"
+            element={
+              <RequireManager>
+                <MyProducts />
+              </RequireManager>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <RequireAuth>
+                <Orders />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/managers"
+            element={
+              <RequireAuth>
+                <Managers />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path="/customers"
+            element={
+              <RequireAuth>
+                <Customers />
+              </RequireAuth>
+            }
+          />
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+    </div>
+  );
+}
 function App() {
   const { logout } = useAuth();
 
@@ -63,47 +176,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Navbar />
-
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <RequireGuest>
-              <Login />
-            </RequireGuest>
-          }
-        />
-
-        <Route
-          path="/register"
-          element={
-            <RequireGuest>
-              <Register />
-            </RequireGuest>
-          }
-        />
-
-        <Route
-          path="/products"
-          element={
-            <RequireAuth>
-              <Products />
-            </RequireAuth>
-          }
-        />
-
-        <Route
-          path="/orders"
-          element={
-            <RequireAuth>
-              <Orders />
-            </RequireAuth>
-          }
-        />
-
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Layout />
     </BrowserRouter>
   );
 }

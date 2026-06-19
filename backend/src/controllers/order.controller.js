@@ -38,3 +38,16 @@ exports.updateOrderStatus = asyncHandler(async (req, res) => {
 
   res.json(order);
 });
+
+exports.getCustomerOrders = asyncHandler(async (req, res) => {
+  console.log("Customer ID:", req.params.id);
+
+  const orders = await orderService.getOrdersByCustomer(req.params.id);
+
+  console.log("Orders found:", orders.length);
+
+  res.json({
+    success: true,
+    data: orders,
+  });
+});

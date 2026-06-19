@@ -23,6 +23,4 @@ const rateLimit = ({ windowSeconds = 60, maxRequests = 20 } = {}) => {
   };
 };
 
-module.exports = {
-  rateLimit,
-};
+module.exports = rateLimit; // ✅ IMPORTANT CHANGE

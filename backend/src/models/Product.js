@@ -31,15 +31,16 @@ const productSchema = new mongoose.Schema(
       min: 0,
       default: 0,
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   {
     timestamps: true,
   },
 );
-
-/*
-Assignment Required Indexes
-*/
 
 productSchema.index({
   category: 1,

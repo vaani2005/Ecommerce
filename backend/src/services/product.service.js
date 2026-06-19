@@ -188,3 +188,9 @@ exports.updateProduct = async (id, data) => {
 exports.deleteProduct = async (id) => {
   return Product.findByIdAndDelete(id);
 };
+exports.getProductsByManager = async (managerId) => {
+  return Product.find({ createdBy: managerId }).lean();
+};
+exports.getMyProducts = async (managerId) => {
+  return Product.find({ createdBy: managerId }).sort({ createdAt: -1 }).lean();
+};

@@ -55,7 +55,10 @@ exports.getProduct = asyncHandler(async (req, res) => {
 });
 
 exports.createProduct = asyncHandler(async (req, res) => {
-  const product = await productService.createProduct(req.body);
+  const product = await productService.createProduct({
+    ...req.body,
+    createdBy: req.user.id,
+  });
 
   await invalidateProductsCache();
 
@@ -75,6 +78,17 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   res.json(product);
 });
 
+exports.getManagerProducts = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const products = await productService.getProductsByManager(id);
+
+  res.json({
+    success: true,
+    data: products,
+  });
+});
+
 exports.deleteProduct = asyncHandler(async (req, res) => {
   const product = await productService.deleteProduct(req.params.id);
 
@@ -87,5 +101,13 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
 
   res.json({
     message: "Product deleted successfully",
+  });
+});
+exports.getMyProducts = asyncHandler(async (req, res) => {
+  const products = await productService.getMyProducts(req.user.id);
+
+  res.json({
+    success: true,
+    data: products,
   });
 });

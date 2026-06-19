@@ -58,7 +58,6 @@ api.interceptors.response.use(
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("user");
 
-        // Dispatch custom event to notify app of token invalidation
         window.dispatchEvent(new Event("tokenExpired"));
 
         window.location.href = "/";
@@ -67,23 +66,19 @@ api.interceptors.response.use(
       }
     }
 
-    // Ensure error response has consistent format
     if (error.response) {
-      // Backend error with response
       error.formattedError = {
         message: error.response.data?.message || error.message,
         fieldErrors: error.response.data?.errors || {},
         status: error.response.status,
       };
     } else if (error.request) {
-      // Request made but no response
       error.formattedError = {
         message: "No response from server. Please check your connection.",
         fieldErrors: {},
         status: 0,
       };
     } else {
-      // Error in request setup
       error.formattedError = {
         message: error.message || "An unexpected error occurred",
         fieldErrors: {},
